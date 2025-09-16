@@ -106,3 +106,7 @@ todoList.addEventListener('click', function(event) {
     // 2. Panggil renderTodos() untuk memperbarui tampilan sesuai data terbaru
     renderTodos();
 });
+
+// --- 5. INISIALISASI APLIKASI ---
+renderTodos();
+saveTodos(); // Pastikan data di localStorage sudah sesuai saat pertama kali load
