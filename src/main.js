@@ -6,19 +6,31 @@ const todoInput = document.querySelector('#todo-input');
 const todoList = document.querySelector('#todo-list');
 const themeToggleButton = document.querySelector('#theme-toggle');
 const themeIcon = document.querySelector('#theme-icon');
+const filtersContainer = document.querySelector('.filters');
 
 // --- 2. STATE APLIKASI ---
 const savedTodos = localStorage.getItem('todos-data');
 let todos = savedTodos ? JSON.parse(savedTodos) : [];
 let currentTheme = localStorage.getItem('theme') || 'light';
+let currentFilter = 'all';  // Default 'all' filter
 
 // --- 3. FUNGSI-FUNGSI ---
 function renderTodos() {
   // 1. Kosongkan dulu daftar <ul> yang ada agar tidak duplikat
   todoList.innerHTML = '';
 
+  const filteredTodos = todos.filter(todo => {
+    if (currentFilter === 'active') {
+      return !todo.completed;
+    }
+    if (currentFilter === 'completed') {
+      return todo.completed;
+    }
+    return true; // Untuk 'all', kembalikan semua
+  });
+
   // 2. Loop setiap objek di dalam array 'todos'
-  todos.forEach(function (todo) {
+  filteredTodos.forEach(function (todo) {
     // 3. Buat elemen <li> baru untuk setiap todo
     const todoElement = document.createElement('li');
     todoElement.classList.add('todo-item');
@@ -53,6 +65,14 @@ function renderTodos() {
         newElement.classList.remove('new');
       }
     });
+  });
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    if (btn.dataset.filter === currentFilter) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
   });
 }
 
@@ -130,32 +150,43 @@ todoList.addEventListener('click', function (event) {
 
 });
 
-  // Event listener untuk tombol tema
+// Event listener untuk tombol tema
 themeToggleButton.addEventListener('click', () => {
-    // Ganti tema dari terang ke gelap atau sebaliknya
-    currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-    
-    if (currentTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-        themeIcon.src = '/light.svg'; // Ganti ikon menjadi matahari
-    } else {
-        document.body.classList.remove('dark-mode');
-        themeIcon.src = '/dark.svg'; // Ganti ikon menjadi bulan
-    }
-    
-    // Simpan preferensi tema ke localStorage
-    localStorage.setItem('theme', currentTheme);
+  // Ganti tema dari terang ke gelap atau sebaliknya
+  currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+  if (currentTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+    themeIcon.src = '/light.svg'; // Ganti ikon menjadi matahari
+  } else {
+    document.body.classList.remove('dark-mode');
+    themeIcon.src = '/dark.svg'; // Ganti ikon menjadi bulan
+  }
+
+  // Simpan preferensi tema ke localStorage
+  localStorage.setItem('theme', currentTheme);
+});
+
+filtersContainer.addEventListener('click', (event) => {
+  const target = event.target;
+  // Pastikan yang diklik adalah tombol filter
+  if (target.matches('.filter-btn')) {
+    // Update state filter saat ini
+    currentFilter = target.dataset.filter;
+    // Render ulang daftar tugas dengan filter yang baru
+    renderTodos();
+  }
 });
 
 // --- 5. INISIALISASI APLIKASI ---
 function applyInitialTheme() {
-    if (currentTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-        themeIcon.src = '/light.svg';
-    } else {
-        document.body.classList.remove('dark-mode');
-        themeIcon.src = '/dark.svg';
-    }
+  if (currentTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+    themeIcon.src = '/light.svg';
+  } else {
+    document.body.classList.remove('dark-mode');
+    themeIcon.src = '/dark.svg';
+  }
 }
 
 applyInitialTheme(); // Terapkan tema saat halaman dimuat
