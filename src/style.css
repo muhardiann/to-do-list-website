@@ -61,8 +61,13 @@ body {
     margin-bottom: 20px;
 }
 
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
 header h1 {
-     margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 /* --- Form Input & Button --- */
@@ -73,7 +78,8 @@ header h1 {
 }
 
 #todo-input {
-    flex-grow: 1; /* Ambil sisa ruang yang tersedia */
+    flex-grow: 1;
+    /* Ambil sisa ruang yang tersedia */
     padding: 12px 15px;
     border: 2px solid var(--border-color);
     background-color: var(--primary-bg);
@@ -106,7 +112,8 @@ header h1 {
 
 /* --- To-Do List & Items --- */
 #todo-list {
-    list-style: none; /* Hapus bullet points dari <ul> */
+    list-style: none;
+    /* Hapus bullet points dari <ul> */
 }
 
 .todo-item {
@@ -142,10 +149,14 @@ header h1 {
 }
 
 .todo-item .delete-btn {
+    display: none;
+    /* Tetap tersembunyi secara default */
     background: none;
     border: none;
     color: #ccc;
+    /* Warna abu-abu netral */
     font-size: 18px;
+    font-weight: bold;
     cursor: pointer;
     transition: color 0.3s;
 }
@@ -179,22 +190,59 @@ header h1 {
 }
 
 .theme-btn img {
-    width: 20px;  /* Sesuaikan ukurannya */
+    width: 20px;
+    /* Sesuaikan ukurannya */
     height: 20px;
-    transition: transform 0.3s ease; /* Transisi untuk efek tambahan */
+    transition: transform 0.3s ease;
+    /* Transisi untuk efek tambahan */
 }
 
 .theme-btn:hover img {
-    transform: scale(1.1); /* Sedikit membesar saat hover */
+    transform: scale(1.1);
+    /* Sedikit membesar saat hover */
+}
+
+.task-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    margin: 10px 0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 14px;
+    color: var(--completed-color);
+}
+
+.delete-controls {
+    display: none;
+    /* Sembunyikan secara default */
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.delete-action-btn {
+    background-color: transparent;
+    border: 1px solid var(--danger-color);
+    color: var(--danger-color);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.delete-action-btn:hover {
+    background-color: var(--danger-color);
+    color: var(--card-bg);
 }
 
 .filters {
     display: flex;
-    justify-content: center;
     gap: 10px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border-color);
 }
 
 .filter-btn {
@@ -215,4 +263,161 @@ header h1 {
 .filter-btn.active {
     color: var(--accent-color);
     border-color: var(--accent-color);
+}
+
+/* --- Delete Mode Active Styles --- */
+
+/* Tampilkan tombol "X" di setiap item saat mode hapus aktif */
+.todo-app.delete-mode-active .todo-item .delete-btn {
+    display: block;
+    /* atau inline-flex, tergantung style Anda */
+}
+
+/* Tampilkan footer kontrol hapus saat mode hapus aktif */
+.todo-app.delete-mode-active .delete-controls {
+    display: flex;
+    /* Mengganti display: none; */
+}
+
+/* Beri feedback visual pada tombol tong sampah saat aktif */
+#delete-mode-btn.active {
+    background-color: var(--danger-color);
+    color: var(--card-bg);
+}
+
+/* Pastikan ikon di dalamnya juga berubah warna agar terlihat */
+#delete-mode-btn.active img {
+    filter: brightness(0) invert(1);
+}
+
+.delete-controls .separator {
+    color: var(--completed-color);
+    align-self: center;
+}
+
+/* --- Modal Styles --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay:not(.hidden) {
+    opacity: 1;
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay:not(.hidden) .modal-content {
+    transform: scale(1);
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--completed-color);
+    cursor: pointer;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+.modal-content p {
+    margin-bottom: 20px;
+    line-height: 1.6;
+    color: var(--completed-color);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.modal-actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.modal-actions button:hover {
+    opacity: 0.8;
+}
+
+/* --- Loader/Spinner Style --- */
+.loader {
+    border: 4px solid var(--border-color);
+    /* Warna dasar lingkaran */
+    border-top: 4px solid var(--accent-color);
+    /* Warna bagian yang berputar */
+    border-radius: 50%;
+    /* Membuatnya menjadi lingkaran sempurna */
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    /* Terapkan animasi */
+    margin: 0 auto 20px auto;
+    /* Memberi jarak ke teks di bawahnya */
+}
+
+/* Mendefinisikan animasi 'spin' */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+        /* Mulai dari posisi 0 derajat */
+    }
+
+    100% {
+        transform: rotate(360deg);
+        /* Selesaikan satu putaran penuh */
+    }
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.btn-secondary {
+    background-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+/* Kelas utilitas untuk menyembunyikan modal */
+.hidden {
+    display: none;
 }

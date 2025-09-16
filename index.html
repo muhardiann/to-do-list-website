@@ -14,9 +14,14 @@
     <header>
       <div class="header-container">
         <h1>My To-Do List</h1>
-        <button id="theme-toggle" class="theme-btn">
-          <img id="theme-icon" src="/dark.svg" alt="Ganti Tema">
-        </button>
+        <div class="header-actions">
+          <button id="theme-toggle" class="theme-btn">
+            <img id="theme-icon" src="/dark.svg" alt="Ganti Tema">
+          </button>
+          <button id="delete-mode-btn" class="theme-btn">
+            <img src="/delete.svg" alt="Mode Hapus">
+          </button>
+        </div>
       </div>
       <form id="new-todo-form">
         <input type="text" id="todo-input" placeholder="Apa yang akan Anda lakukan hari ini?" autocomplete="off" />
@@ -24,19 +29,58 @@
       </form>
     </header>
 
+    <div class="task-controls">
+      <span id="task-counter"></span>
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">Semua</button>
+        <button class="filter-btn" data-filter="active">Aktif</button>
+        <button class="filter-btn" data-filter="completed">Selesai</button>
+      </div>
+    </div>
+
     <main>
       <ul id="todo-list">
       </ul>
     </main>
-    
-    <footer class="filters">
-            <button class="filter-btn active" data-filter="all">Semua</button>
-            <button class="filter-btn" data-filter="active">Aktif</button>
-            <button class="filter-btn" data-filter="completed">Selesai</button>
-        </footer>
+
+    <footer class="delete-controls">
+      <button id="clear-active-btn" class="delete-action-btn">Hapus Aktif</button>
+      <span class="separator">atau</span>
+      <button id="clear-completed-btn" class="delete-action-btn">Hapus Selesai</button>
+    </footer>
   </div>
 
   <script type="module" src="/src/main.js"></script>
+
+  <div id="confirmation-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <h2>Konfirmasi Hapus</h2>
+      <p>Apakah Anda yakin ingin menghapus tugas-tugas ini? Tindakan ini tidak dapat diurungkan.</p>
+      <div class="modal-actions">
+        <button id="cancel-delete-btn" class="btn-secondary">Batalkan</button>
+        <button id="confirm-delete-btn" class="btn-danger">Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="loader"></div>
+      <p>Memproses...</p>
+    </div>
+  </div>
+
+  <div id="success-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <h2>Berhasil!</h2>
+      <p>Tugas yang dipilih telah berhasil dihapus.</p>
+      <div class="modal-actions">
+        <button id="close-success-btn" class="btn-primary">Tutup</button>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>

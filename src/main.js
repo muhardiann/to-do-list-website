@@ -7,12 +7,28 @@ const todoList = document.querySelector('#todo-list');
 const themeToggleButton = document.querySelector('#theme-toggle');
 const themeIcon = document.querySelector('#theme-icon');
 const filtersContainer = document.querySelector('.filters');
+const taskCounter = document.querySelector('#task-counter');
+const clearCompletedBtn = document.querySelector('#clear-completed-btn');
+const todoAppContainer = document.querySelector('.todo-app');
+const deleteModeBtn = document.querySelector('#delete-mode-btn');
+const clearActiveBtn = document.querySelector('#clear-active-btn');
+const separator = document.querySelector('.separator');
+const confirmationModal = document.querySelector('#confirmation-modal');
+const loadingModal = document.querySelector('#loading-modal');
+const successModal = document.querySelector('#success-modal');
+const confirmDeleteBtn = document.querySelector('#confirm-delete-btn');
+const cancelDeleteBtn = document.querySelector('#cancel-delete-btn');
+const closeSuccessBtn = document.querySelector('#close-success-btn');
+const modalOverlays = document.querySelectorAll('.modal-overlay');
+const modalCloseBtns = document.querySelectorAll('.modal-close');
 
 // --- 2. STATE APLIKASI ---
 const savedTodos = localStorage.getItem('todos-data');
 let todos = savedTodos ? JSON.parse(savedTodos) : [];
 let currentTheme = localStorage.getItem('theme') || 'light';
 let currentFilter = 'all';  // Default 'all' filter
+let isDeleteMode = false;
+let pendingDeleteAction = null; // Untuk menyimpan aksi hapus ('active' atau 'completed')
 
 // --- 3. FUNGSI-FUNGSI ---
 function renderTodos() {
@@ -68,18 +84,43 @@ function renderTodos() {
   });
 
   document.querySelectorAll('.filter-btn').forEach(btn => {
-    if (btn.dataset.filter === currentFilter) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
+    btn.classList.toggle('active', btn.dataset.filter === currentFilter);
   });
+
+  const hasActive = todos.some(todo => !todo.completed);
+  const hasCompleted = todos.some(todo => todo.completed);
+
+  clearActiveBtn.style.display = 'none';
+  clearCompletedBtn.style.display = 'none';
+  separator.style.display = 'none';
+
+  if (currentFilter === 'all') {
+    if (hasActive) clearActiveBtn.style.display = 'block';
+    if (hasCompleted) clearCompletedBtn.style.display = 'block';
+    if (hasActive && hasCompleted) separator.style.display = 'block';
+  } else if (currentFilter === 'active') {
+    if (hasActive) clearActiveBtn.style.display = 'block';
+  } else if (currentFilter === 'completed') {
+    if (hasCompleted) clearCompletedBtn.style.display = 'block';
+  }
+
+  // Hitung tugas yang masih aktif (belum selesai)
+  const activeTodosCount = todos.filter(todo => !todo.completed).length;
+  taskCounter.textContent = `${activeTodosCount} tugas tersisa`;
 }
 
 function saveTodos() {
   // Ubah array 'todos' menjadi string JSON dan simpan ke localStorage
   // dengan kunci 'todos-data'
   localStorage.setItem('todos-data', JSON.stringify(todos));
+}
+
+function openModal(modal) {
+  modal.classList.remove('hidden');
+}
+
+function closeAllModals() {
+  modalOverlays.forEach(modal => modal.classList.add('hidden'));
 }
 
 // --- 4. EVENT LISTENERS ---
@@ -178,6 +219,58 @@ filtersContainer.addEventListener('click', (event) => {
   }
 });
 
+clearActiveBtn.addEventListener('click', () => {
+  pendingDeleteAction = 'active';
+  openModal(confirmationModal);
+});
+
+clearCompletedBtn.addEventListener('click', () => {
+  pendingDeleteAction = 'completed';
+  openModal(confirmationModal);
+});
+
+// Event listener untuk tombol Mode Hapus
+deleteModeBtn.addEventListener('click', () => {
+  // 1. Balikkan status mode hapus (dari false ke true, atau sebaliknya)
+  isDeleteMode = !isDeleteMode;
+
+  // 2. Tambahkan/hapus class 'delete-mode-active' pada kontainer utama
+  todoAppContainer.classList.toggle('delete-mode-active');
+
+  // 3. Tambahkan/hapus class 'active' pada tombol itu sendiri untuk feedback
+  deleteModeBtn.classList.toggle('active');
+});
+
+confirmDeleteBtn.addEventListener('click', () => {
+  closeAllModals();
+  openModal(loadingModal);
+
+  setTimeout(() => {
+    if (pendingDeleteAction === 'active') {
+      todos = todos.filter(todo => todo.completed);
+    } else if (pendingDeleteAction === 'completed') {
+      todos = todos.filter(todo => !todo.completed);
+    }
+
+    renderTodos();
+    saveTodos();
+    closeAllModals();
+    openModal(successModal);
+    pendingDeleteAction = null; // Reset state
+  }, 500); // Simulasi proses hapus
+});
+
+cancelDeleteBtn.addEventListener('click', closeAllModals);
+closeSuccessBtn.addEventListener('click', closeAllModals);
+modalCloseBtns.forEach(btn => btn.addEventListener('click', closeAllModals));
+modalOverlays.forEach(overlay => {
+  overlay.addEventListener('click', (event) => {
+    if (event.target === overlay) {
+      closeAllModals();
+    }
+  });
+});
+
 // --- 5. INISIALISASI APLIKASI ---
 function applyInitialTheme() {
   if (currentTheme === 'dark') {
@@ -191,4 +284,3 @@ function applyInitialTheme() {
 
 applyInitialTheme(); // Terapkan tema saat halaman dimuat
 renderTodos(); // Render daftar tugas
-saveTodos(); // Pastikan data di localStorage sudah sesuai saat pertama kali load
